@@ -17,7 +17,7 @@ export default {
         changeOrigin: true,
         secure: true,
         ws: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, '') // replaces the '/api' part of the path with just '/'
       }
     }
   }
