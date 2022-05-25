@@ -187,6 +187,7 @@ function BottomPart(){
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "'top' as const",
@@ -200,14 +201,32 @@ function BottomPart(){
       x: {
         grid: {
           display: false
-        }
+        },
+        ticks: {
+          font: {
+              size: 16,
+          },
+          autoSkip: false,
+          maxRotation: 80,
+          minRotation: 60
+        },
+        stacked: true
       },
       y: {
         grid: {
           display: false
-        }
+        },
+        ticks: {
+          // padding: 70,
+          crossAlign: 'start'
+        },
       }
-    }
+    },
+    // layout: {
+    //   padding: {
+    //       left: 500
+    //   }
+    // }
   };
 
   const labels = ['Shasta', 'Oroville', 'Trinity Lake', 'New Melones', 'San Luis', 'Don Pedro', 'Berryessa'];
@@ -219,6 +238,9 @@ function BottomPart(){
         label: 'Reservoir Water Storage Data',
         data: chartData,
         backgroundColor: 'rgb(66,145,152)',
+        barPercentage: 1,
+        barThickness: 33,
+        categoryPercentage: 0.8,
       }
     ],
   };
