@@ -3,6 +3,26 @@ import './App.css';
 import ReactMonthPicker from 'react-month-picker';
 import "react-month-picker/css/month-picker.css";
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 
 function TopPart (){
 
@@ -97,10 +117,22 @@ async function getChartData(startDate, endDate){
   let response = await fetch('/api/getChartData', params);
   response = await response.json();
   console.log(response);
+
+  let valuesArray = [];
+  for (let i = 0; i < response.length; i++){
+    valuesArray.push(response[i].value);
+  }
+
+  console.log(valuesArray);
+
+  return valuesArray;
+
 }
 
 
-const MonthPicker = ({ range }) => {
+function BottomPart(){
+
+  const [chartData, setChartData] = useState([]);
   const [isVisible, setVisibility] = useState(false);
   const [monthYear, setMonthYear] = useState({year: 2022, month: 4});
 
@@ -123,6 +155,9 @@ const MonthPicker = ({ range }) => {
     // the api seems to answer fine for just the month and year as well
   
     getChartData(`${year}-${month}`, `${year}-${month}`)
+      .then((chart)=>{
+        setChartData(chart);
+      })
       .catch((err)=>{
         console.log("An Error Occurred:", err);
       });
@@ -135,39 +170,11 @@ const MonthPicker = ({ range }) => {
     return month && year ? `${months[month]} ${year}` : "Select Month";
   };
 
-  return (
-    <div className="MonthYearPicker">
-      <input type="text" placeholder="April 2022" value={getMonthValue()} onClick={showMonthPicker} readOnly/>
-
-      <ReactMonthPicker
-        show={isVisible}
-        lang={[
-          "Jan",
-          "Feb",
-          "Mar",
-          "Apr",
-          "May",
-          "Jun",
-          "Jul",
-          "Aug",
-          "Sep",
-          "Oct",
-          "Nov",
-          "Dec"
-        ]}
-        years={range}
-        value={monthYear}
-        onChange={handleOnChange}
-        onDismiss={handleOnDismiss}
-      />
-    </div>
-  );
-};
-
-function BottomPart(){
-
   useEffect(function () { // not using this 'useEffect' thingy causes my fetch calls to be made twice for some reason
     getChartData("2022-4", "2022-4") // cuz initially it is hardcoded to be April 2022
+      .then((chart)=>{
+        setChartData(chart);
+      })
       .catch((err)=>{
         console.log("An Error Occurred:", err);
       });
@@ -178,16 +185,78 @@ function BottomPart(){
     max: { year: 2022, month: 6 }
   };
 
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "'top' as const",
+      },
+      title: {
+        display: false, // NOTE THAT DISPLAY IS SET TO FALSE
+        text: 'Chart.js Bar Chart',
+      }
+    },
+    scales: {
+      x: {
+        grid: {
+          display: false
+        }
+      },
+      y: {
+        grid: {
+          display: false
+        }
+      }
+    }
+  };
+
+  const labels = ['Shasta', 'Oroville', 'Trinity Lake', 'New Melones', 'San Luis', 'Don Pedro', 'Berryessa'];
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Reservoir Water Storage Data',
+        data: chartData,
+        backgroundColor: 'rgb(66,145,152)',
+      }
+    ],
+  };
+
   return (
     <div id="special-container">
 
       <div id="graph-div">
+        <Bar options={options} data={data} />
       </div>
 
       <div id="special-text">
         <p>Here's a quick look at some of the data on reservoirs from the <a target="_blank" rel="noreferrer noopener" href="https://cdec.water.ca.gov/index.html">California Data Exchange Center</a>, which consolidates climate and water data from multiple federal and state government agencies, and  electric utilities.  Select a month and year to see storage levels in the eleven largest in-state reservoirs.</p>
         <p id="change-month">Change Month:</p>
-        <MonthPicker range={range} />
+
+        <input type="text" placeholder="April 2022" value={getMonthValue()} onClick={showMonthPicker} readOnly/>
+
+        <ReactMonthPicker
+          show={isVisible}
+          lang={[
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+          ]}
+          years={range}
+          value={monthYear}
+          onChange={handleOnChange}
+          onDismiss={handleOnDismiss}
+        />
       </div>
 
     </div>

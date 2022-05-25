@@ -88,7 +88,7 @@ a {
 #graph-div {
     width: 50%;
     height: 300px;
-    background-color: rgb(66,145,152);
+    /* background-color: rgb(66,145,152); */
     margin-right: 30px;
 }
 
