@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import ReactMonthPicker from 'react-month-picker';
+import "react-month-picker/css/month-picker.css";
 
 
 function TopPart (){
@@ -75,34 +77,106 @@ function TopPart (){
   }
 }
 
+async function getChartData(startDate, endDate){
+
+  let reqObj = {};
+  reqObj.startDate = startDate; // the api seems to answer fine for just the month and year as well
+  reqObj.endDate = endDate;
+
+  console.log("reqObj:", reqObj);
+
+  let params = {
+    method: "POST",
+    headers: 
+      {
+        'Content-Type': 'application/json'
+      }, 
+    body: JSON.stringify(reqObj)
+  }
+
+  let response = await fetch('/api/getChartData', params);
+  response = await response.json();
+  console.log(response);
+}
+
+
+const MonthPicker = ({ range }) => {
+  const [isVisible, setVisibility] = useState(false);
+  const [monthYear, setMonthYear] = useState({year: 2022, month: 4});
+
+  const showMonthPicker = event => {
+    setVisibility(true);
+    event.preventDefault();
+  };
+
+  let months = ["FillerMonth", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  const handleOnDismiss = () => {
+    setVisibility(false);
+  };
+
+  const handleOnChange = (year, month) => {
+    setMonthYear({ year, month });
+    setVisibility(false);
+    console.log("Month changed!!!");
+
+    // the api seems to answer fine for just the month and year as well
+  
+    getChartData(`${year}-${month}`, `${year}-${month}`)
+      .catch((err)=>{
+        console.log("An Error Occurred:", err);
+      });
+  };
+
+  const getMonthValue = () => {
+    const month = monthYear && monthYear.month ? monthYear.month : 0;
+    const year = monthYear && monthYear.year ? monthYear.year : 0;
+
+    return month && year ? `${months[month]} ${year}` : "Select Month";
+  };
+
+  return (
+    <div className="MonthYearPicker">
+      <input type="text" placeholder="April 2022" value={getMonthValue()} onClick={showMonthPicker} readOnly/>
+
+      <ReactMonthPicker
+        show={isVisible}
+        lang={[
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ]}
+        years={range}
+        value={monthYear}
+        onChange={handleOnChange}
+        onDismiss={handleOnDismiss}
+      />
+    </div>
+  );
+};
 
 function BottomPart(){
 
-  async function getChartData(){
-    let reqObj = {};
-    reqObj.startDate = "2022-04-01";
-    reqObj.endDate = "2022-04-30";
+  useEffect(function () { // not using this 'useEffect' thingy causes my fetch calls to be made twice for some reason
+    getChartData("2022-4", "2022-4") // cuz initially it is hardcoded to be April 2022
+      .catch((err)=>{
+        console.log("An Error Occurred:", err);
+      });
+  }, []);
 
-    let params = {
-      method: "POST",
-      headers: 
-        {
-          'Content-Type': 'application/json'
-        }, 
-      body: JSON.stringify(reqObj)
-    }
-
-    let response = await fetch('/api/getChartData', params);
-    response = await response.json();
-    console.log(response);
-  }
-
-  getChartData()
-    .catch((err)=>{
-      console.log("An Error Occurred:", err);
-    });
-
-  // "https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=SHA,ORO&SensorNums=15&dur_code=M&Start=2022-01-01&End=2022-12-31"
+  const range = {
+    min: { year: 2010, month: 1 },
+    max: { year: 2022, month: 6 }
+  };
 
   return (
     <div id="special-container">
@@ -113,7 +187,7 @@ function BottomPart(){
       <div id="special-text">
         <p>Here's a quick look at some of the data on reservoirs from the <a target="_blank" rel="noreferrer noopener" href="https://cdec.water.ca.gov/index.html">California Data Exchange Center</a>, which consolidates climate and water data from multiple federal and state government agencies, and  electric utilities.  Select a month and year to see storage levels in the eleven largest in-state reservoirs.</p>
         <p id="change-month">Change Month:</p>
-        <input type="text" placeholder="April 2022" readOnly/>
+        <MonthPicker range={range} />
       </div>
 
     </div>
@@ -129,10 +203,13 @@ function App() {
     console.log(response);
   }
 
-  apiCall()
-    .catch((err)=>{
-      console.log("An Error Occurred:", err);
-    });
+  useEffect(function () {
+    apiCall()
+      .catch((err)=>{
+        console.log("An Error Occurred:", err);
+      });
+  }, []);
+  
 
   return (
     <TopPart/>

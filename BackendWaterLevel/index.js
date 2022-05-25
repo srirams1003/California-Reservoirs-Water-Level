@@ -35,7 +35,7 @@ app.get("/reply_frontend", function(req, res, next){
 
 app.post("/getChartData", function(req, res, next){
 
-  let queryString = `https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=SHA,ORO&SensorNums=15&dur_code=M&Start=${req.body.startDate}&End=${req.body.endDate}`;
+  let queryString = `https://cdec.water.ca.gov/dynamicapp/req/JSONDataServlet?Stations=SHA,ORO,CLE,NML,LUS,DNP,BER&SensorNums=15&dur_code=M&Start=${req.body.startDate}&End=${req.body.endDate}`;
 
   fetch(queryString)
     .then( async resp=>{
