@@ -220,16 +220,28 @@ function BottomPart(){
           // padding: 70,
           crossAlign: 'start'
         },
+        stacked: true
       }
-    },
-    // layout: {
-    //   padding: {
-    //       left: 500
-    //   }
-    // }
+    }
   };
 
   const labels = ['Shasta', 'Oroville', 'Trinity Lake', 'New Melones', 'San Luis', 'Don Pedro', 'Berryessa'];
+  let capacities = [4552000, 3537577, 2447650, 2400000, 1062000, 2030000, 1602000]; // these values stay constant and thus can be hardcoded
+
+  let invalidDataFlag = 0;
+
+  for (let i = 0; i < capacities.length; i++) {
+    if (chartData[i] < 0){
+      invalidDataFlag = 1
+      break;
+    }
+    capacities[i] = capacities[i] - chartData[i]
+  }
+
+  if (invalidDataFlag){
+    setChartData([]);
+    capacities = [];
+  }
 
   const data = {
     labels,
@@ -238,6 +250,14 @@ function BottomPart(){
         label: 'Reservoir Water Storage Data',
         data: chartData,
         backgroundColor: 'rgb(66,145,152)',
+        barPercentage: 1,
+        barThickness: 33,
+        categoryPercentage: 0.8,
+      },
+      {
+        label: 'Reservoir Capacity',
+        data: capacities,
+        backgroundColor: 'rgb(120,199,227)',
         barPercentage: 1,
         barThickness: 33,
         categoryPercentage: 0.8,
