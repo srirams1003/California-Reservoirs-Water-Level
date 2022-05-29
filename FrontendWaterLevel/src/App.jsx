@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import ReactMonthPicker from 'react-month-picker';
 import "react-month-picker/css/month-picker.css";
+import FadeIn from 'react-fade-in';
 
 import {
   Chart as ChartJS,
@@ -60,7 +61,9 @@ function TopPart (){
 
           </div>
 
-          <BottomPart/>
+          <FadeIn>
+            <BottomPart/>
+          </FadeIn>
 
         </main>
       </div>
@@ -130,8 +133,22 @@ async function getChartData(startDate, endDate){
 }
 
 
+
 function BottomPart(){
 
+  const capacities = [4552000, 3537577, 2447650, 2400000, 1062000, 2030000, 1602000]; // these values stay constant and thus can be hardcoded
+  let lightblueBar = new Array(capacities.length);
+
+  function divideByMil(array){
+    for (let i = 0; i < array.length; i++){
+      if (capacities[i] < array[i]){ // SO RESEROIR OVERFLOWS?
+        array[i] = capacities[i];
+      }
+      array[i] = array[i]/Math.pow(10, 6);
+    }
+    return array;
+  }
+  
   const [chartData, setChartData] = useState([]);
   const [isVisible, setVisibility] = useState(false);
   const [monthYear, setMonthYear] = useState({year: 2022, month: 4});
@@ -156,6 +173,7 @@ function BottomPart(){
   
     getChartData(`${year}-${month}`, `${year}-${month}`)
       .then((chart)=>{
+        chart = divideByMil(chart);
         setChartData(chart);
       })
       .catch((err)=>{
@@ -173,6 +191,7 @@ function BottomPart(){
   useEffect(function () { // not using this 'useEffect' thingy causes my fetch calls to be made twice for some reason
     getChartData("2022-4", "2022-4") // cuz initially it is hardcoded to be April 2022
       .then((chart)=>{
+        chart = divideByMil(chart);
         setChartData(chart);
       })
       .catch((err)=>{
@@ -180,9 +199,11 @@ function BottomPart(){
       });
   }, []);
 
+  let today = new Date();
+
   const range = {
-    min: { year: 2010, month: 1 },
-    max: { year: 2022, month: 6 }
+    min: { year: 1990, month: 1 },
+    max: { year: today.getFullYear(), month: today.getMonth()+1 }
   };
 
   const options = {
@@ -191,6 +212,13 @@ function BottomPart(){
     plugins: {
       legend: {
         position: "'top' as const",
+        labels: {
+          color: "blue",  // not 'fontColor:' anymore
+          // fontSize: 18  // not 'fontSize:' anymore
+          font: {
+            size: 18 // 'size' now within object 'font {}'
+          }
+        }
       },
       title: {
         display: false, // NOTE THAT DISPLAY IS SET TO FALSE
@@ -200,11 +228,13 @@ function BottomPart(){
     scales: {
       x: {
         grid: {
-          display: false
+          display: false,
+          borderWidth: 1.7,
+          borderColor: 'darkgrey'
         },
         ticks: {
           font: {
-              size: 16,
+            size: 16,
           },
           autoSkip: false,
           maxRotation: 80,
@@ -214,9 +244,15 @@ function BottomPart(){
       },
       y: {
         grid: {
-          display: false
+          display: false,
+          borderWidth: 1.7,
+          borderColor: 'darkgrey'
         },
         ticks: {
+          font: {
+            size: 16,
+          },
+          maxTicksLimit: 8,
           // padding: 70,
           crossAlign: 'start'
         },
@@ -226,21 +262,20 @@ function BottomPart(){
   };
 
   const labels = ['Shasta', 'Oroville', 'Trinity Lake', 'New Melones', 'San Luis', 'Don Pedro', 'Berryessa'];
-  let capacities = [4552000, 3537577, 2447650, 2400000, 1062000, 2030000, 1602000]; // these values stay constant and thus can be hardcoded
 
   let invalidDataFlag = 0;
 
   for (let i = 0; i < capacities.length; i++) {
     if (chartData[i] < 0){
-      invalidDataFlag = 1
+      invalidDataFlag = 1;
       break;
     }
-    capacities[i] = capacities[i] - chartData[i]
+    lightblueBar[i] = (capacities[i] - (chartData[i]*Math.pow(10, 6))) / Math.pow(10, 6);
   }
 
   if (invalidDataFlag){
     setChartData([]);
-    capacities = [];
+    lightblueBar = [];
   }
 
   const data = {
@@ -256,7 +291,7 @@ function BottomPart(){
       },
       {
         label: 'Reservoir Capacity',
-        data: capacities,
+        data: lightblueBar,
         backgroundColor: 'rgb(120,199,227)',
         barPercentage: 1,
         barThickness: 33,
@@ -276,7 +311,7 @@ function BottomPart(){
         <p>Here's a quick look at some of the data on reservoirs from the <a target="_blank" rel="noreferrer noopener" href="https://cdec.water.ca.gov/index.html">California Data Exchange Center</a>, which consolidates climate and water data from multiple federal and state government agencies, and  electric utilities.  Select a month and year to see storage levels in the eleven largest in-state reservoirs.</p>
         <p id="change-month">Change Month:</p>
 
-        <input type="text" placeholder="April 2022" value={getMonthValue()} onClick={showMonthPicker} readOnly/>
+        <input type="text" placeholder="Select Month" value={getMonthValue()} onClick={showMonthPicker} readOnly/>
 
         <ReactMonthPicker
           show={isVisible}
