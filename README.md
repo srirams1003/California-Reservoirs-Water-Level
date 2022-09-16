@@ -25,7 +25,7 @@ Once you have the above packages installed, execute the steps below.
   ```
 * installing frontend dependencies
   ```sh
-  cd FrontendWaterLevel
+  cd ../FrontendWaterLevel
   npm install
   ```
 
