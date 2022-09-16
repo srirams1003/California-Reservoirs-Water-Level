@@ -49,5 +49,11 @@ Assuming here that you have executed all the steps in the "Installation" phase a
   cd FrontendWaterLevel
   npm run dev
   ```
+Desktop View:
+![alt text](https://freeimage.host/i/iIU3dl)
+
+Mobile View:
+![alt text](https://freeimage.host/i/iIUKeS)
+
 
 
