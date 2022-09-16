@@ -3,6 +3,8 @@
 
 A full-stack webapp that provides information on the water levels of California's various reservoirs along with an option to view the water levels of each reservoir relative to each other from any month starting from 1990.
 
+The app works seamlessly on Mobile and Tablet Views too, in addition to Desktop view.
+
 
 ### Built With
 
