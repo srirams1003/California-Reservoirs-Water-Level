@@ -1,2 +1,5 @@
 .DS_Store
-*.local
+.cache
+*replit*
+.upm
+node_modules
