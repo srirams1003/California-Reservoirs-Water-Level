@@ -49,10 +49,10 @@ Assuming here that you have executed all the steps in the "Installation" phase a
   cd FrontendWaterLevel
   npm run dev
   ```
-Desktop View:
+* Desktop View:
 ![alt text](https://raw.githubusercontent.com/srirams1003/imageHosting/main/Screen%20Shot%202022-09-16%20at%202.44.15%20PM.png?token=GHSAT0AAAAAABSOB2ADFXS2QXUXKBXX6LAUYZE7X3A)
 
-Mobile View:
+* Mobile View:
 ![alt text](https://raw.githubusercontent.com/srirams1003/imageHosting/main/Screen%20Shot%202022-09-16%20at%202.43.29%20PM.png?token=GHSAT0AAAAAABSOB2AC7A3XQP5ALHVV5SR2YZE7XAQ)
 
 
